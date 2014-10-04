@@ -84,4 +84,4 @@ function BaseModel(db, collection){
 	}
 }
 
-module.exports.BaseModel = BaseModel;
+module.exports = BaseModel;
