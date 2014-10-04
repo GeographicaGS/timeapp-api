@@ -56,6 +56,9 @@
 
 **/
 
+var ObjectID = require('mongodb').ObjectID;
+
+
 function BaseModel(db,defaultcol){
 	this._db = db;
 	this._col = defaultcol;
@@ -67,7 +70,8 @@ function BaseModel(db,defaultcol){
 	this.find = function(query, callback){
 		if(typeof(query) != "undefined" && typeof(callback) != "undefined"){
 			return this._col.find(query, callback);
-		}else{
+		}
+		else{
 			return this._col.find();
 		}
 	}
@@ -86,6 +90,15 @@ function BaseModel(db,defaultcol){
 
 	this.count = function(query, callback){
 		this._col.count(query, callback);
+	}
+
+	this.parseQuery = function(query){
+		if (query && query.hasOwnProperty("id")){
+
+			query._id = new ObjectID(query.id);
+			delete query["id"];
+		}
+		return query;
 	}
 }
 

@@ -3,6 +3,7 @@ var config = require("./config.js")
 
 function authenticate(req, res, next) {
 
+
     var credentials = {
         hash : req.get("auth-hash"),
         username :req.get("auth-username"),
@@ -16,11 +17,10 @@ function authenticate(req, res, next) {
         });
     }
     else{
-        var db = req.db,
-            col = db.collection("users"),
-            currentTime = new Date().getTime();
 
-        col.findOne({username: credentials.username},function(error,user){
+        var currentTime = new Date().getTime();
+
+        app.usersModel.getUser({ username: credentials.username },function(error,user){
             if (!user){
                 res.status(401)
                 res.json({
@@ -39,6 +39,7 @@ function authenticate(req, res, next) {
             }
             // let check the password
             if (md5(credentials.username + user.password + credentials.timestamp) == credentials.hash){
+                req.user = user;
                 // login successfull, let's allow the request
                 next();   
             }

@@ -19,13 +19,14 @@ var UserModel = require("./models/usermodel.js");
 var db = null;
 app.projectModel = null;
 app.userModel = null;
+
+require("date-utils");
+
 // app.hoursModel = null;
 // app.projectSpendingsModel = null;
 // app.projectInvoicesModel = null;
 // app.projectMembersModel = null;
 // app.projectBudgetsModel = null;
-
-
 
 MongoClient.connect(config.mongodb, function(err, localdb) {
     if(err) throw err;
@@ -67,21 +68,12 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-
 // Make our db accessible to our router
 app.use(function(req,res,next){
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "auth-hash,auth-username,auth-timestamp");
-    req.db = db;
     next();
 });
-
-app.get('/auth/demo', 
-    auth,
-    function(req,res) { 
-      res.send("You're in!");
-    }
-);
 
 app.use('/', routes);
 app.use('/users', users);
