@@ -31,7 +31,7 @@ ProjectModel.prototype.createProject = function(params, callback) {
 */
 ProjectModel.prototype.getProject = function(params, callback){
 	if(params.id){
-		this._col.findOne({_id: param.id}, params.callback);
+		this._col.findOne(this.parseQuery(params), callback);
 	}else if(params.name){
 		var self = this;
 		this._col.find({name: params.name}, function(err, cursor){
@@ -51,7 +51,7 @@ ProjectModel.prototype.getProject = function(params, callback){
 	*colour: colour for project's items
 */
 ProjectModel.prototype.updateProject = function(params, callback) {
-	this._col.update({_id: params.id},
+	this._col.update(this.parseQuery(params),
 		{ name: params.name, hour_cost: params.hour_cost, colour: params.colour},
 		callback);
 }
