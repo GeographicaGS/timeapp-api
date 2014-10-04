@@ -10,7 +10,26 @@ router.get('/', auth, function(req, res) {
 });
 
 router.get('/islogged', auth, function(req, res) {
-  res.json({"login": true})
+    
+    user = {
+        id : req.user._id,
+        username : req.user.username,
+        name : req.user.name,
+        surname : req.user.name,
+        profile : req.user.profile
+    }
+
+    res.json(user);
+});
+
+router.get('/:id/timesheet', function(req, res) {
+    var id = req.params.id;
+    app.usersModel.getUser({
+        id : id
+    },function(error,user){
+        res.json(user);     
+    });
+
 });
 
 module.exports = router;
