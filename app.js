@@ -14,28 +14,35 @@ var MongoClient = require('mongodb').MongoClient
 
 md5 = require('MD5');
 
-var BaseModel = require("./models/basemodel.js");
+var UserModel = require("./models/usermodel.js");
 
 var db = null;
 app.projectModel = null;
 app.userModel = null;
-app.hoursModel = null;
-app.projectSpendingsModel = null;
-app.projectInvoicesModel = null;
-app.projectMembersModel = null;
-app.projectBudgetsModel = null;
+// app.hoursModel = null;
+// app.projectSpendingsModel = null;
+// app.projectInvoicesModel = null;
+// app.projectMembersModel = null;
+// app.projectBudgetsModel = null;
+
+
 
 MongoClient.connect(config.mongodb, function(err, localdb) {
     if(err) throw err;
     db = localdb;
 
-    app.projectModel = new BaseModel(db,'projects');
-    app.usersModel = new BaseModel(db,'users');
-    app.hoursModel = new BaseModel(db, 'hours');
-    app.projectSpendingsModel = new BaseModel(db, 'project_spendings');
-    app.projectInvoicesModel = new BaseModel(db, 'project_invoices');
-    app.projectMembersModel = new BaseModel(db, 'project_members');
-    app.projectBudgetsModel = new BaseModel(db, 'project_budgets');
+   // app.projectModel = new BaseModel(db,'projects');
+    app.usersModel = new UserModel(db,'users');
+
+    // app.usersModel.getUser("admin",function(error,user){
+    //     console.log(user);
+    // });
+
+    // app.hoursModel = new BaseModel(db, 'hours');
+    // app.projectSpendingsModel = new BaseModel(db, 'project_spendings');
+    // app.projectInvoicesModel = new BaseModel(db, 'project_invoices');
+    // app.projectMembersModel = new BaseModel(db, 'project_members');
+    // app.projectBudgetsModel = new BaseModel(db, 'project_budgets');
 
     if (config.createUsersOnStart){
         var collection = db.collection('users');
@@ -52,15 +59,8 @@ MongoClient.connect(config.mongodb, function(err, localdb) {
             }
             
         });
-
     }
-    
 })
-
-var timestamp = new Date().getTime();
-
-console.log("Hash: " + md5("admin" + md5("admin") + timestamp))
-console.log("timestamp: " + timestamp);
 
 
 app.use(logger('dev'));
@@ -70,6 +70,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Make our db accessible to our router
 app.use(function(req,res,next){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "auth-hash,auth-username,auth-timestamp");
     req.db = db;
     next();
 });

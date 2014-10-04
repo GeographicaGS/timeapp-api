@@ -9,4 +9,8 @@ router.get('/', auth, function(req, res) {
 	});
 });
 
+router.get('/islogged', auth, function(req, res) {
+  res.json({"login": true})
+});
+
 module.exports = router;
