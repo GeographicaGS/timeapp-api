@@ -16,6 +16,8 @@ md5 = require('MD5');
 
 var db = null;
 
+
+
 MongoClient.connect(config.mongodb, function(err, localdb) {
     if(err) throw err;
     db = localdb;
@@ -35,15 +37,8 @@ MongoClient.connect(config.mongodb, function(err, localdb) {
             }
             
         });
-
     }
-    
 })
-
-var timestamp = new Date().getTime();
-
-console.log("Hash: " + md5("admin" + md5("admin") + timestamp))
-console.log("timestamp: " + timestamp);
 
 
 app.use(logger('dev'));
@@ -53,6 +48,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Make our db accessible to our router
 app.use(function(req,res,next){
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "auth-hash,auth-username,auth-timestamp");
     req.db = db;
     next();
 });
