@@ -52,36 +52,37 @@
 
 **/
 
-function BaseModel(db, collection){
-	this._db = db.collection(collection);
+function BaseModel(db,defaultcol){
+	this._db = db;
+	this._col = defaultcol;
 	
 	this.findOne = function(query, callback){
-		this._db.findOne(query, callback);
+		this._col.findOne(query, callback);
 	}
 
 	this.find = function(query, callback){
 		if(typeof(query) != "undefined" && typeof(callback) != "undefined"){
-			return this._db.find(query, callback);
+			return this._col.find(query, callback);
 		}else{
-			return this._db.find();
+			return this._col.find();
 		}
 	}
 
 	this.insert = function(data, callback){
-		this._db.insert(data, callback);
+		this._col.insert(data, callback);
 	}
 
 	this.update = function(query, data, callback){
-		this._db.update(query, data, callback);
+		this._col.update(query, data, callback);
 	}
 
 	this.delete = function(query, callback){
-		this._db.delete(query, callback);
+		this._col.delete(query, callback);
 	}
 
 	this.count = function(query, callback){
-		this._db.count(query, callback);
+		this._col.count(query, callback);
 	}
 }
 
-module.exports.BaseModel = BaseModel;
+module.exports = BaseModel;

@@ -14,16 +14,16 @@ var MongoClient = require('mongodb').MongoClient
 
 md5 = require('MD5');
 
-var BaseModel = require("./models/basemodel.js");
+var UserModel = require("./models/usermodel.js");
 
 var db = null;
 app.projectModel = null;
 app.userModel = null;
-app.hoursModel = null;
-app.projectSpendingsModel = null;
-app.projectInvoicesModel = null;
-app.projectMembersModel = null;
-app.projectBudgetsModel = null;
+// app.hoursModel = null;
+// app.projectSpendingsModel = null;
+// app.projectInvoicesModel = null;
+// app.projectMembersModel = null;
+// app.projectBudgetsModel = null;
 
 
 
@@ -31,13 +31,18 @@ MongoClient.connect(config.mongodb, function(err, localdb) {
     if(err) throw err;
     db = localdb;
 
-    app.projectModel = new BaseModel(db,'projects');
-    app.usersModel = new BaseModel(db,'users');
-    app.hoursModel = new BaseModel(db, 'hours');
-    app.projectSpendingsModel = new BaseModel(db, 'project_spendings');
-    app.projectInvoicesModel = new BaseModel(db, 'project_invoices');
-    app.projectMembersModel = new BaseModel(db, 'project_members');
-    app.projectBudgetsModel = new BaseModel(db, 'project_budgets');
+   // app.projectModel = new BaseModel(db,'projects');
+    app.usersModel = new UserModel(db,'users');
+
+    // app.usersModel.getUser("admin",function(error,user){
+    //     console.log(user);
+    // });
+
+    // app.hoursModel = new BaseModel(db, 'hours');
+    // app.projectSpendingsModel = new BaseModel(db, 'project_spendings');
+    // app.projectInvoicesModel = new BaseModel(db, 'project_invoices');
+    // app.projectMembersModel = new BaseModel(db, 'project_members');
+    // app.projectBudgetsModel = new BaseModel(db, 'project_budgets');
 
     if (config.createUsersOnStart){
         var collection = db.collection('users');
