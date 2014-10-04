@@ -19,14 +19,16 @@
 	id_proj: id,
 	id_user: id,
 	date: date,
-	n_hours: number
+	n_hours: number,
+	comment: text
 }
 
 * Project_Spendings {
 	id_proj: id,
 	name: text,
 	desc: text,
-	cost: number
+	cost: number,
+	date: date
 }
 
 * Project_Invoices {
@@ -34,7 +36,8 @@
 	title: text,
 	desc: text,
 	cost: number,
-	paid: boolean
+	paid: boolean,
+	date: date
 }
 
 * Project_Members {
@@ -43,11 +46,12 @@
 	hour_cost: number	
 }
 
-* Project_budget {
+* Project_Budget {
 	id_proj: id,
 	name: text,
 	desc: text,
-	amount: number
+	amount: number,
+	date: date
 }
 
 **/
