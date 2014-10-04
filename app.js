@@ -3,10 +3,10 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 
+var auth = require('./auth.js').authenticate;
+app = express();
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var auth = require('./auth.js').authenticate;
-var app = express();
 var config = require("./config.js");
 
 var MongoClient = require('mongodb').MongoClient
@@ -14,11 +14,28 @@ var MongoClient = require('mongodb').MongoClient
 
 md5 = require('MD5');
 
+var BaseModel = require("./models/basemodel.js");
+
 var db = null;
+app.projectModel = null;
+app.userModel = null;
+app.hoursModel = null;
+app.projectSpendingsModel = null;
+app.projectInvoicesModel = null;
+app.projectMembersModel = null;
+app.projectBudgetsModel = null;
 
 MongoClient.connect(config.mongodb, function(err, localdb) {
     if(err) throw err;
     db = localdb;
+
+    app.projectModel = new BaseModel(db,'projects');
+    app.usersModel = new BaseModel(db,'users');
+    app.hoursModel = new BaseModel(db, 'hours');
+    app.projectSpendingsModel = new BaseModel(db, 'project_spendings');
+    app.projectInvoicesModel = new BaseModel(db, 'project_invoices');
+    app.projectMembersModel = new BaseModel(db, 'project_members');
+    app.projectBudgetsModel = new BaseModel(db, 'project_budgets');
 
     if (config.createUsersOnStart){
         var collection = db.collection('users');
