@@ -57,7 +57,7 @@ ProjectModel.prototype.updateProject = function(params, callback) {
 }
 
 ProjectModel.prototype.deleteProject = function(id, callback){
-	this._col.update({_id: id}, {active: false}, callback);
+	this._col.update(this.parseQuery({id: id}), {active: false}, callback);
 }
 
 // Members
@@ -72,15 +72,15 @@ ProjectModel.prototype.getMembers = function(params, callback){
 		var self = this;
 		var query = {};
 		params.id_project ? query.id_proj = params.id_project;
-		params.id_member ? query._id = params.id_member;
-		col_member.find(query, function(err, cursor){
+		params.id_member ? query.id = params.id_member;
+		col_member.find(this.parseQuery(query), function(err, cursor){
 			if(!err){
 				cursor.toArray(function(err, array){
 					if(!err){
 						var members = [];
 						var col_user = self._bd.collection("users");
 						for (var member in array){
-							col_user.findOne({_id: member.id_user}, function(err, user){
+							col_user.findOne(self.parseQuery({_id: member.id_user}), function(err, user){
 								if(!err){
 									user.hour_cost = member.hour_cost;
 									members.push(user);
@@ -128,7 +128,7 @@ ProjectModel.prototype.addMember = function(params, callback){
 ProjectModel.prototype.updateMemberCost = function(params, callback){
 	var col_member = this._bd.collection(project_members);
 	col_member.update(
-		{id_proj: params.id_proj, id_user: params.id_user}, 
+		this.parseQuery({id_proj: params.id_proj, id_user: params.id_user}), 
 		{hour_cost: params.hour_cost}, 
 		callback);
 }
@@ -139,7 +139,7 @@ ProjectModel.prototype.updateMemberCost = function(params, callback){
 */
 ProjectModel.prototype.deleteMember = function(params, callback){
 	var col_member = this._bd.collection(project_members);
-	col_member.update({id_proj: params.id_proj, id_user: params.id_user}, {active: false}, callback);
+	col_member.update(this.parseQuery({id_proj: params.id_proj, id_user: params.id_user}), {active: false}, callback);
 }
 
 // Hours
@@ -153,10 +153,10 @@ ProjectModel.prototype.getHours = function(params, callback){
 	var col_hour = this._bd.collection("hours");
 	var self = this;
 	var query = {};
-	params.id_hour ? query._id = params.id_hour;
+	params.id_hour ? query.id = params.id_hour;
 	params.id_proj ? query.id_proj = params.id_proj;
 	params.id_user ? query.id_user = params.id_user;
-	col_hour.find(query, function(err, cursor){
+	col_hour.find(this.parseQuery(query), function(err, cursor){
 		if(!err){
 			cursor.toArray(self.callback);
 		}else{
@@ -194,7 +194,7 @@ ProjectModel.prototype.updateHour = function(params, callback){
 	params.n_hours ? data.n_hours = params.n_hours;
 	params.comment ? data.comment = params.n_hours;
 	if (Object.keys(data).length > 0){
-		col_hour.update({_id: params.id_hour}, data, callback);
+		col_hour.update(this.parseQuery({id: params.id_hour}), data, callback);
 	}else{
 		callback({error: 'TODO: Define errors. ERROR: Empty params.'}, null);
 	}
@@ -218,7 +218,7 @@ ProjectModel.prototype.getBudgets = function(params, callback){
 		var query = {};
 		params.id_budget ? query._id = params.id_budget;
 		params.id_proj ? query.id_proj = params.id_proj;
-		col_budget.find(query, function(err, cursor){
+		col_budget.find(this.parseQuery(query), function(err, cursor){
 			if(!err){
 				cursor.toArray(self.callback);
 			}else{
@@ -264,7 +264,7 @@ ProjectModel.prototype.updateBudget = function(params, callback){
 	params.amount ? data.amount = params.amount;
 	params.date ? data.date = params.date;
 	if (Object.keys(data).length > 0){
-		col_budget.update({_id: params.id_budget}, data, callback);
+		col_budget.update(this.parseQuery({id: params.id_budget}), data, callback);
 	}else{
 		callback({error: 'TODO: Define errors. ERROR: Empty params.'}, null);
 	}
@@ -272,7 +272,7 @@ ProjectModel.prototype.updateBudget = function(params, callback){
 
 ProjectModel.prototype.deleteBudget = function(id, callback){
 	var col_budget = this._bd.collection("project_budgets");
-	col_budget.remove({_id: id}, callback);
+	col_budget.remove(this.parseQuery({id: id}), callback);
 }
 
 // Spendings
@@ -286,9 +286,9 @@ ProjectModel.prototype.getSpendings = function(params, callback){
 		var col_spending = this._bd.collection("project_spendings");
 		var self = this;
 		var query = {};
-		params.id_spending ? query._id = params.id_spending;
+		params.id_spending ? query.id = params.id_spending;
 		params.id_proj ? query.id_proj = params.id_proj;
-		col_spending.find(query, function(err, cursor){
+		col_spending.find(this.parseQuery(query), function(err, cursor){
 			if(!err){
 				cursor.toArray(self.callback);
 			}else{
@@ -334,7 +334,7 @@ ProjectModel.prototype.updateSpending = function(params, callback){
 	params.cost ? data.cost = params.cost;
 	params.date ? data.date = params.date;
 	if (Object.keys(data).length > 0){
-		col_spending.update({_id: params.id_spending}, data, callback);
+		col_spending.update(this.parseQuery({id: params.id_spending}), data, callback);
 	}else{
 		callback({error: 'TODO: Define errors. ERROR: Empty params.'}, null);
 	}
@@ -342,7 +342,7 @@ ProjectModel.prototype.updateSpending = function(params, callback){
 
 ProjectModel.prototype.deleteSpending = function(id, callback){
 	var col_spending = this._bd.collection("project_Spendings");
-	col_spending.remove({_id: id}, callback);
+	col_spending.remove(this.parseQuery({id: id}), callback);
 }
 
 // Invoices
@@ -356,9 +356,9 @@ ProjectModel.prototype.getInvoices = function(params, callback){
 		var col_invoice = this._bd.collection("project_invoices");
 		var self = this;
 		var query = {};
-		params.id_invoice ? query._id = params.id_invoice;
+		params.id_invoice ? query.id = params.id_invoice;
 		params.id_proj ? query.id_proj = params.id_proj;
-		col_invoice.find(query, function(err, cursor){
+		col_invoice.find(this.parseQuery(query), function(err, cursor){
 			if(!err){
 				cursor.toArray(self.callback);
 			}else{
@@ -404,7 +404,7 @@ ProjectModel.prototype.updateInvoice = function(params, callback){
 	params.cost ? data.cost = params.cost;
 	params.date ? data.date = params.date;
 	if (Object.keys(data).length > 0){
-		col_invoice.update({_id: params.id_invoice}, data, callback);
+		col_invoice.update(this.parseQuery({id: params.id_invoice}), data, callback);
 	}else{
 		callback({error: 'TODO: Define errors. ERROR: Empty params.'}, null);
 	}
@@ -412,7 +412,7 @@ ProjectModel.prototype.updateInvoice = function(params, callback){
 
 ProjectModel.prototype.deleteInvoice = function(id, callback){
 	var col_invoice = this._bd.collection("project_invoices");
-	col_invoice.remove({_id: id}, callback);
+	col_invoice.remove(this.parseQuery({id: id}), callback);
 }
 
 

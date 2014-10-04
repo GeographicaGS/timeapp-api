@@ -98,6 +98,13 @@ function BaseModel(db,defaultcol){
 			query._id = new ObjectID(query.id);
 			delete query["id"];
 		}
+
+		var keys = Object.keys(query);
+		for (var key in keys){
+			if(key.indexOf("id_") != -1){
+				query.key = new ObjectID(querry.key);
+			}
+		}
 		return query;
 	}
 }
