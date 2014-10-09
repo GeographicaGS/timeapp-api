@@ -56,6 +56,64 @@
 
 **/
 
+/**
+Projects {
+	slug: text,
+	name: text,
+	customer : text,
+	price_hour: number,
+	creator : id_user,
+	date_creation: date,
+	date_start: date,
+	date_finish: date,
+	color: #fff,
+	status: number,
+	removed: false,
+	total_spendings : number,
+	total_invoices: number,
+	total_hours_price: number,
+	budgets : [
+		{
+			amount: number,
+			desc: text,
+			date: date,
+			id_user: id
+		}
+	],
+	invoices: [
+		{
+			invoice_number: text,
+			amount: number,
+			desc: text,
+			date: date,
+			id_user: id
+		}
+	],
+	spendings : [
+		{
+			amount: number,
+			desc: text,
+			id_user: id
+		}
+	],
+	members: [
+		{
+			id_user: id,
+			price_hour: number,
+		}
+	]
+
+}
+
+Users {
+	username: text,
+	password: md5(text),
+	name: text,
+	surname: text,
+	profile: number
+} 
+**/
+
 var ObjectID = require('mongodb').ObjectID;
 
 

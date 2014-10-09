@@ -1,8 +1,19 @@
 var md5 = require('MD5');
-var config = require("./config.js")
+var config = require("./config.js");
+var database = require("./database.js");
+var UserModel = database.UserModel;
 
 function authenticate(req, res, next) {
 
+    if (!config.authEnable){
+
+        UserModel.getUser({ username: "admin"},function(error,user){
+            req.user = user;
+            next();
+        });
+       
+        return;
+    }
 
     var credentials = {
         hash : req.get("auth-hash"),
@@ -20,7 +31,7 @@ function authenticate(req, res, next) {
 
         var currentTime = new Date().getTime();
 
-        app.usersModel.getUser({ username: credentials.username },function(error,user){
+        UserModel.getUser({ username: credentials.username },function(error,user){
             if (!user){
                 res.status(401)
                 res.json({
@@ -50,10 +61,8 @@ function authenticate(req, res, next) {
                     "messsage" : "Bad credentials"
                 });
             }
-        });
-          
+        });      
     }
-    
 }
 
 module.exports.authenticate = authenticate;
