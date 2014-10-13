@@ -1,11 +1,20 @@
 var express = require('express');
 var router = express.Router();
 var auth = require('../auth.js').authenticate;
+var database = require("../database.js");
+var UserModel = database.UserModel;
 
-/* GET home page. */
+/* GET users */
 router.get('/', auth, function(req, res) {
-	app.usersModel.find().toArray(function(error, array){
-   		res.send(array);
+	UserModel.getUsers(function(error, array){
+        if (error){
+            res.status(400).json({
+                message : "Error",
+            });
+        }
+   		res.json({
+            "results" : array
+        });
 	});
 });
 
@@ -32,4 +41,21 @@ router.get('/:id/timesheet', function(req, res) {
 
 });
 
+router.get('/projects', auth,function(req, res) {
+    
+    UserModel.getUserProjects(req.user._id,function(err,items){
+        if (err){
+            res.status(400).json({
+                message : "Internal error",
+                error : err
+            });
+        }
+        else{
+            res.json({
+                "results": items
+            });
+        }
+    })
+
+});
 module.exports = router;

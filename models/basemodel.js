@@ -1,71 +1,19 @@
 /**
 * MODELS 
 
-* Projects {
-	name: text,
-	hour_cost: number,
-	colour: hex,	
-}
-
-* Users {
-	username: text,
-	password: md5(text),
-	name: text,
-	surname: text,
-	profile: number
-} 
-
-* Hours {
-	id_proj: id,
-	id_user: id,
-	date: date,
-	n_hours: number,
-	comment: text
-}
-
-* Project_Spendings {
-	id_proj: id,
-	name: text,
-	desc: text,
-	cost: number,
-	date: date
-}
-
-* Project_Invoices {
-	id_proj: id,
-	title: text,
-	desc: text,
-	cost: number,
-	paid: boolean,
-	date: date
-}
-
-* Project_Members {
-	id_proj: id,
-	id_user: id,
-	hour_cost: number	
-}
-
-* Project_Budget {
-	id_proj: id,
-	name: text,
-	desc: text,
-	amount: number,
-	date: date
-}
-
-**/
-
 /**
 Projects {
 	slug: text,
 	name: text,
 	customer : text,
-	price_hour: number,
+	type_rate : number,
+	hourly_rate: number,
 	creator : id_user,
 	date_creation: date,
 	date_start: date,
 	date_finish: date,
+	last_date_mod: date,
+	last_user_mod: date,
 	color: #fff,
 	status: number,
 	removed: false,
@@ -99,11 +47,42 @@ Projects {
 	members: [
 		{
 			id_user: id,
-			price_hour: number,
+			hourly_rate: number,
+		}
+	],
+
+	notes: [
+		{
+			id_user: id,
+			note: text,
+			date: date
 		}
 	]
 
 }
+
+projects_hours{
+	id_project :id,
+	id_user: id,
+	year: number,
+	week: number,
+	// Day of the week
+	day: number,
+	approved : boolean,
+	nhours: number,
+}
+
+weeks{
+	year: nummber,
+	week: number,
+	id_user: id,
+	notes: {
+		id_user: id,
+		date: date,
+		note: text
+	}
+}
+
 
 Users {
 	username: text,
@@ -114,7 +93,8 @@ Users {
 } 
 **/
 
-var ObjectID = require('mongodb').ObjectID;
+var ObjectID = require('mongodb').ObjectID,
+ 	util = require('util');
 
 
 function BaseModel(db,defaultcol){
@@ -151,17 +131,24 @@ function BaseModel(db,defaultcol){
 	}
 
 	this.parseQuery = function(query){
-		if (query && query.hasOwnProperty("id")){
+		// if (query && query.hasOwnProperty("id")){
+		// 	query._id = new ObjectID(query.id);
+		// 	delete query["id"];
+		// }
+		for (var key in query){
 
-			query._id = new ObjectID(query.id);
-			delete query["id"];
-		}
-
-		var keys = Object.keys(query);
-		for (var key in keys){
-			if(key.indexOf("id_") != -1){
-				query.key = new ObjectID(querry.key);
+			if (util.isArray(query[key])){
+				for (var i=0;i<query[key].length;i++){
+					query[key][i] = this.parseQuery(query[key][i]);	
+				}
 			}
+			else if (key == "id"){
+				query[key] = new ObjectID(query[key]);
+			}
+			else if(key.indexOf("id_") != -1){
+				query[key] = new ObjectID(query[key]);
+			}
+			
 		}
 		return query;
 	}

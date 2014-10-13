@@ -14,7 +14,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Make our db accessible to our router
 app.use(function(req,res,next){
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "auth-hash,auth-username,auth-timestamp");
+    res.header("Access-Control-Allow-Headers", "auth-hash,auth-username,auth-timestamp,Content-Type");
+    res.header("Access-Control-Allow-Methods","GET,POST,PUT,DELETE");
     next();
 });
 
@@ -30,10 +31,12 @@ database.init(function(err){
     var routes = require("./routes/index");
     var users = require("./routes/users");
     var projects = require("./routes/projects");
+    var timesheet = require("./routes/timesheet");
 
     app.use("/", routes);
     app.use("/users", users);
     app.use("/projects",projects);
+    app.use("/timesheet",timesheet);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
