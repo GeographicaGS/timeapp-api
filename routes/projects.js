@@ -113,7 +113,7 @@ router.get('/:slug',auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
                 error: err
             });
         }
-        else{d
+        else{
             res.json(project);
         }
     });

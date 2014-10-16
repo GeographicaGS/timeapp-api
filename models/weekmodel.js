@@ -11,6 +11,14 @@ function WeekModel(db) {
 
 util.inherits(WeekModel, BaseModel);
 
+
+/*
+opts{
+    id_user:
+    year:
+    week
+}
+*/
 WeekModel.prototype.getWeek = function(opts, callback) { 
 
     this._col.findOne(

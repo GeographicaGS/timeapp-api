@@ -6,6 +6,7 @@ var utils = require("../utils.js");
 
 var database = require("../database.js");
 var TimeModel = database.TimeModel;
+var WeekModel = database.WeekModel;
 var moment = require("moment");
 
 /* Create time. */
@@ -32,19 +33,37 @@ router.post('/time',auth, function(req, res) {
         day: date.isoWeekday(),
         approved : false,
         nhours :  h + m/60,
-    }
+    };
 
-    TimeModel.insertTime(data,function(err,items){
+    // check if the status of the week to insert is already reject or pending
+    WeekModel.getWeek({
+        id_user : req.user._id,
+        year: data.year,
+        week : data.week
+    },function(err,week){
         if (err){
-            res.status(400).json({
-                "message" : "Internal error",
-                "error": err
-            });
-        }
+            res.status(400).json({message: "Internal error"})  
+        } 
         else{
-            res.json({
-                "insert" : true
-            });
+            if (week.status != cons.ST_WEEK_PENDING && week.status!=cons.ST_WEEK_REJECTED){
+                res.status(403).json({forbidden:true});
+            }
+            else{
+                TimeModel.insertTime(data,function(err,items){
+                    if (err){
+                        res.status(400).json({
+                            "message" : "Internal error",
+                            "error": err
+                        });
+                    }
+                    else{
+                        res.json({
+                            "insert" : true
+                        });
+                    }
+                });    
+            }
+            
         }
     });
 
