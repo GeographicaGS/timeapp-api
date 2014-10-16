@@ -106,8 +106,34 @@ WeekModel.prototype.sendWeekForApproval = function(opts,data, callback) {
 };
 
 WeekModel.prototype.getWeeks = function(status, callback) { 
-    this._col.find({status: parseInt(status)},{sort: {date_send:1}}).toArray(callback);
+    var query = {};
+     if (status && status!="0"){
+        query["status"] = parseInt(status);
+    }
+
+    this._col.find(query,{sort: {date_send:1}}).toArray(callback);
 };
+
+
+
+/*
+opts{
+    id_user: id,
+    status : status
+}
+*/
+WeekModel.prototype.getUserWeeks = function(opts, callback) { 
+    var query = {
+        id_user: new ObjectID(opts.id_user)
+    };
+
+    if (opts.status && opts.status!="0"){
+        query["status"] = parseInt(opts.status);
+    }
+
+    this._col.find(query,{sort: {date_send:1}}).toArray(callback);
+};
+
 
 WeekModel.prototype.getProjectsInWeek = function(id_week, callback) { 
 
@@ -138,5 +164,15 @@ WeekModel.prototype.setWeekStatus = function(id,opts,callback){
     }, data, callback);
 }
 
+WeekModel.prototype.addComment = function(id,data,callback){
+
+    this._col.update({_id : new ObjectID(id)}, {$push : { notes : {
+            note: data.comment,
+            id_user: new ObjectID(data.id_user),
+            date: new Date()
+        }}}, callback);
+
+};
+       
 
 module.exports = WeekModel;

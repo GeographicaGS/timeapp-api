@@ -18,14 +18,28 @@ TimeModel.prototype.updateTime = function(id,data, callback) {
     this._col.update({_id : new ObjectID(id)},{$set:data},callback);
 };
 
-TimeModel.prototype.approveWeek = function(opts, callback) { 
+TimeModel.prototype.getTime = function(opts, callback) { 
+    var query = {
+        _id : new ObjectID(opts.id),
+        id_user : new ObjectID(opts.id_user)
+    };
+    this._col.findOne(query,callback);
+};
+
+
+
+
+TimeModel.prototype.approveOrRejectWeek = function(opts, callback) { 
+
+    var value = opts.status == cons.ST_WEEK_ACCEPTED ? true : false;
+    console.log(value);
     this._col.update(
         {
             year : opts.year,
             week : opts.week,
             id_user: new ObjectID(opts.id_user)
         }
-        ,{$set:{approved:true}},
+        ,{$set:{approved:value}},
         {multi : true}
         ,callback);
 };

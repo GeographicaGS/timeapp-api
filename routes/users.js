@@ -31,16 +31,6 @@ router.get('/islogged', auth, function(req, res) {
     res.json(user);
 });
 
-router.get('/:id/timesheet', function(req, res) {
-    var id = req.params.id;
-    app.usersModel.getUser({
-        id : id
-    },function(error,user){
-        res.json(user);     
-    });
-
-});
-
 router.get('/projects', auth,function(req, res) {
     
     UserModel.getUserProjects(req.user._id,function(err,items){

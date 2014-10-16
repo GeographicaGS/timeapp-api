@@ -42,9 +42,7 @@ ProjectModel.prototype.getProject = function(slug, callback) {
 };
 
 ProjectModel.prototype.getProjectById = function(id,fields, callback) { 
-	if (!fields){
-		fields = {};
-	}
+
 	this._col.findOne({_id : new ObjectID(id)},fields,callback);
 };
 
@@ -67,7 +65,7 @@ ProjectModel.prototype.updateTotalHoursPrice = function(id, callback) {
 	
 	var _this = this;
 	// get project
-	this.getProjectById(id,function(err,proj){
+	this.getProjectById(id,{},function(err,proj){
 		if (err) {
 			callback(err);
 			return;

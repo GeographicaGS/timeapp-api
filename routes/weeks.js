@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var auth = require('../auth.js').authenticate;
+var moduleauth = require('../auth.js');
+var auth = moduleauth.authenticate;
+var profile = moduleauth.profile;   
 var slugs = require("slugs");
 var cons = require("../cons.js");
 
@@ -10,10 +12,29 @@ var ProjectModel = database.ProjectModel;
 var TimeModel = database.TimeModel;
 
 /* Get weeks by status */
-router.get("/list",auth,function(req,res){
+router.get("/list",auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
     var st = req.param("status");
 
     WeekModel.getWeeks(st,function(err,items){
+        if (err ){
+            res.status(400).json({
+                message: "Internal error",
+                error: err
+            });
+        }
+        else{
+            res.json({ results : items});
+        }
+    });
+});
+
+router.get("/user/list",auth,function(req,res){
+    var st = req.param("status");
+
+    WeekModel.getUserWeeks({
+        status: st,
+        id_user: req.user._id
+    },function(err,items){
         if (err ){
             res.status(400).json({
                 message: "Internal error",
@@ -31,6 +52,7 @@ router.get("/:id",auth,function(req,res){
     var id = req.params.id;
 
     WeekModel.getWeekCompleteByID(id,function(err,data){
+
         if (err ){
             res.status(400).json({
                 message: "Internal error",
@@ -38,16 +60,26 @@ router.get("/:id",auth,function(req,res){
             });
         }
         else{
-            res.json(data);
+
+            if (req.user.profile<cons.ST_PROFILE_ADMIN 
+                && !data.id_user.equals(req.user._id)){
+                res.status(403).json({forbidden:1})
+            }
+            else{
+                res.json(data);    
+            }    
+            
         }
     });
 });
 
 /* Change week status */
-router.post("/change_status/:id",auth,function(req,res){
+router.post("/change_status/:id",auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
     var b = req.body,
         id = req.params.id,
         week = null;    
+
+    b.status = parseInt(b.status);
 
     if (!b.status || !id || b.status=="undefined" || 
         (b.status!=cons.ST_WEEK_REJECTED && b.status!=cons.ST_WEEK_ACCEPTED) ){
@@ -79,10 +111,12 @@ router.post("/change_status/:id",auth,function(req,res){
     // update all document projects_times
     function updateTimes(){
 
-        TimeModel.approveWeek({
+        TimeModel.approveOrRejectWeek({
             id_user: week.id_user,
             year: week.year,
-            week: week.week
+            week: week.week,
+            status: b.status
+
         },function(err,d){
             if (err){
                 sendError(err);
@@ -109,11 +143,8 @@ router.post("/change_status/:id",auth,function(req,res){
                         }
                     });
                 }    
-                
             }
-            
-        })
-        
+        });
     }
 
 
@@ -136,22 +167,32 @@ router.post("/change_status/:id",auth,function(req,res){
         });
     }
 
-    if (b.status == cons.ST_WEEK_REJECTED){
-        // no update only change week Stattus
-        setWeekStatus();
-    }
-    else if (b.status == cons.ST_WEEK_ACCEPTED){
-        getWeek();
-        setWeekStatus();
-    }
-
+   
+    getWeek();
+    setWeekStatus();
     
-
 
 });
 
+/* Add a comment to week*/
+router.post("/addcomment/:id",auth,function(req,res){
+    if (!req.body.comment || req.body.comment=="undefined" || !req.params.id || req.params.id=="undefined"){
+        res.status(400).json({message:"Bad parameters"});
+    }
+    else{
+        WeekModel.addComment(req.params.id,{
+                comment: req.body.comment,
+                id_user : req.user._id
+            },function(err){
+            if (err) res.status(400).json({message: "Internal error", error: err});
+            else res.json({ok:1})
+        });
+    }
+});
+
+
 /* Get user week. */
-router.get('/:year/:week',auth, function(req, res) {
+router.get('/:year/:week',auth, profile(cons.ST_PROFILE_ADMIN),function(req, res) {
     
     var year = req.params.year,
         week = req.params.week;
@@ -206,6 +247,7 @@ router.post('/:year/:week',auth, function(req, res) {
     });
 
 });
+
 
 
 module.exports = router;
