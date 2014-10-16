@@ -2,6 +2,7 @@ var md5 = require('MD5');
 var config = require("./config.js");
 var database = require("./database.js");
 var UserModel = database.UserModel;
+var cons = require("./cons.js");
 
 function authenticate(req, res, next) {
 
@@ -65,4 +66,24 @@ function authenticate(req, res, next) {
     }
 }
 
+function profile(minprofile) {
+
+    return function(req, res, next){
+
+        if (!config.authEnable){
+            next();
+            return;
+        }
+
+        if (req.user.profile >= minprofile){
+            next();
+        }
+        else{
+            res.status(403).json({messsage : "Forbidden"});
+        }
+    }
+}
+
 module.exports.authenticate = authenticate;
+
+module.exports.profile = profile;

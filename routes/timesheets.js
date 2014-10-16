@@ -6,6 +6,7 @@ var utils = require("../utils.js");
 
 var database = require("../database.js");
 var TimeModel = database.TimeModel;
+var moment = require("moment");
 
 /* Create time. */
 router.post('/time',auth, function(req, res) {
@@ -18,22 +19,20 @@ router.post('/time',auth, function(req, res) {
         });
         return;
     }
-    var date = new Date(b.date),
+
+    var date = moment(b.date),
         h = parseInt(b.hours),
         m = parseInt(b.minutes);
 
     var data = {
         id_project : b.id_project,
         id_user : req.user._id,
-        year : date.getFullYear(),
-        week : date.getWeekNumber(),
-        day: utils.dateDay(date),
+        year : date.isoWeekYear(),
+        week : date.isoWeek(),
+        day: date.isoWeekday(),
         approved : false,
         nhours :  h + m/60,
-        removed : false,
     }
-
-    console.log(data);
 
     TimeModel.insertTime(data,function(err,items){
         if (err){
@@ -98,7 +97,7 @@ router.delete('/time/:id',auth, function(req, res) {
         return;
     }
     
-    TimeModel.updateTime(id,{removed : true},function(err,items){
+    TimeModel.removeTime(id,function(err,items){
         if (err){
             res.status(400).json({
                 "message" : "Internal error",
@@ -107,16 +106,16 @@ router.delete('/time/:id',auth, function(req, res) {
         }
         else{
             res.json({
-                "updated" : true
+                "removed" : true
             });
         }
     });
 });
 
 
-router.get('/week/:number',auth, function(req, res) {
+router.get('/week/:year/:week',auth, function(req, res) {
 
-    TimeModel.getUserWeek({ id_user: req.user._id, week: req.params.number},function(err,items){
+    TimeModel.getUserWeek({ id_user: req.user._id, year: req.params.year, week: req.params.week},function(err,items){
         if (err){
             res.status(400).json({
                 "message" : "Internal error",

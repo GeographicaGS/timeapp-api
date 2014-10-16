@@ -5,8 +5,6 @@ var bodyParser = require("body-parser");
 var app = express();
 var database = require("./database.js");
 
-require("date-utils");
-
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -31,12 +29,14 @@ database.init(function(err){
     var routes = require("./routes/index");
     var users = require("./routes/users");
     var projects = require("./routes/projects");
-    var timesheet = require("./routes/timesheet");
+    var timesheets = require("./routes/timesheets");
+    var weeks = require("./routes/weeks");
 
     app.use("/", routes);
     app.use("/users", users);
     app.use("/projects",projects);
-    app.use("/timesheet",timesheet);
+    app.use("/timesheets",timesheets);
+    app.use("/weeks",weeks);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {

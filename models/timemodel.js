@@ -18,6 +18,21 @@ TimeModel.prototype.updateTime = function(id,data, callback) {
     this._col.update({_id : new ObjectID(id)},{$set:data},callback);
 };
 
+TimeModel.prototype.approveWeek = function(opts, callback) { 
+    this._col.update(
+        {
+            year : opts.year,
+            week : opts.week,
+            id_user: new ObjectID(opts.id_user)
+        }
+        ,{$set:{approved:true}},
+        {multi : true}
+        ,callback);
+};
+
+TimeModel.prototype.removeTime = function(id, callback) { 
+    this._col.remove({_id : new ObjectID(id)},callback);
+};
 // opts = {
 //     id_user:
 //     week: 
@@ -27,8 +42,8 @@ TimeModel.prototype.getUserWeek = function(opts, callback) {
     this._col.find(
         {
             id_user : new ObjectID(opts.id_user),
-            week : parseInt(opts.week),
-            removed : false
+            year : parseInt(opts.year),
+            week : parseInt(opts.week)
         }
     ).toArray(function(err,items){
         if (err){
@@ -38,12 +53,12 @@ TimeModel.prototype.getUserWeek = function(opts, callback) {
             response = [];
             for (var i=0;i<7;i++){
                 response[i] = {
-                    day : i,
+                    day : i+1,
                     projects : []
                 };
             }
             for (var i=0;i<items.length;i++){
-                response[items[i].day].projects.push({
+                response[items[i].day-1].projects.push({
                     id_project : items[i].id_project,
                     nhours : items[i].nhours,
                     id : items[i]._id

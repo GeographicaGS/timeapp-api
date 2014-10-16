@@ -36,7 +36,7 @@ function createIndex(){
         }
     }); 
 
-    db.collection('projects').ensureIndex({ status: 1,remove:1},{background:true},function(err){
+    db.collection('projects').ensureIndex({ status: 1},{background:true},function(err){
         if(err) {
             console.error('Error creating index ' + err.message);
         }
@@ -47,12 +47,6 @@ function createIndex(){
             console.error('Error creating index ' + err.message);
         }
     });  
-
-    db.collection('projects').ensureIndex({ slug: 1,remove:1},{background:true},function(err){
-        if(err) {
-            console.error('Error creating index ' + err.message);
-        }
-    });
 
     db.collection('projects').ensureIndex({ "members.id_user":1 },{background:true},function(err){
         if(err) {
@@ -66,7 +60,7 @@ function createIndex(){
         }
     });
 
-    db.collection('weeks').ensureIndex({ year: 1,week:1,id_user:1,removed:1},{background:true},function(err){
+    db.collection('weeks').ensureIndex({ year: 1,week:1,id_user:1},{background:true},function(err){
         if(err) {
             console.error('Error creating index ' + err.message);
         }
@@ -90,7 +84,7 @@ function createIndex(){
         }
     });
 
-    db.collection('projects_times').ensureIndex({ id_project: 1,id_user:1, year:1, week:1,day:1,removed:1},{background:true,unique:true},function(err){
+    db.collection('projects_times').ensureIndex({ id_project: 1,id_user:1, year:1, week:1,day:1},{background:true,unique:true},function(err){
         if(err) {
             console.error('Error creating index ' + err.message);
         }
@@ -187,6 +181,7 @@ function init(callback){
         module.exports.UserModel = new (require("./models/usermodel.js"))(db);
         module.exports.ProjectModel = new (require("./models/projectmodel.js"))(db);
         module.exports.TimeModel = new (require("./models/timemodel.js"))(db);
+        module.exports.WeekModel = new (require("./models/weekmodel.js"))(db);
 
         callback(err);
 

@@ -16,12 +16,12 @@ Projects {
 	last_user_mod: date,
 	color: #fff,
 	status: number,
-	removed: false,
 	total_spendings : number,
 	total_invoices: number,
 	total_hours_price: number,
 	budgets : [
 		{
+			id: uuid
 			amount: number,
 			desc: text,
 			date: date,
@@ -30,7 +30,8 @@ Projects {
 	],
 	invoices: [
 		{
-			invoice_number: text,
+			id: uuid
+			ref: text,
 			amount: number,
 			desc: text,
 			date: date,
@@ -39,6 +40,7 @@ Projects {
 	],
 	spendings : [
 		{
+			id: uuid
 			amount: number,
 			desc: text,
 			id_user: id
@@ -53,6 +55,7 @@ Projects {
 
 	notes: [
 		{
+			id: uuid,
 			id_user: id,
 			note: text,
 			date: date
@@ -76,11 +79,13 @@ weeks{
 	year: nummber,
 	week: number,
 	id_user: id,
-	notes: {
+	notes: [{
 		id_user: id,
 		date: date,
 		note: text
-	}
+	}],
+	date_send: date,
+	status : int
 }
 
 
@@ -102,7 +107,7 @@ function BaseModel(db,defaultcol){
 	this._col = defaultcol;
 	
 	this.findOne = function(query, callback){
-		this._col.findOne(query, callback);
+		this._col.findOne(query, callback);asd
 	}
 
 	this.find = function(query, callback){
