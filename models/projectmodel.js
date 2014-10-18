@@ -92,13 +92,14 @@ ProjectModel.prototype.updateTotalHoursPrice = function(id, callback) {
 				else if (result && result.length>0) {
 
 					total_price = result[0].total * proj.hourly_rate;
+
 					// save 
-					_this.edit(proj._id,{total_hours_price : total_price},function(err,d){
+					_this.edit(proj._id,{total_hours_price : total_price, total_hours: result[0].total},function(err,d){
 						callback(null,total_price);
 					});
 				}
 				else{
-					_this.edit(proj._id,{total_hours_price : 0},function(err,d){
+					_this.edit(proj._id,{total_hours_price : 0, total_hours : 0},function(err,d){
 						callback(null,0);
 					});
 				}
@@ -115,19 +116,21 @@ ProjectModel.prototype.updateTotalHoursPrice = function(id, callback) {
 				}
 				else if(result && result.length>0){
 					total_price = 0;
+					var total_hours = 0;
 
 					for (var i=0;i<result.length;i++){
 						var user = _.filter(proj.members, function(m){ return m.id_user.equals(result[i]._id); })[0];
 						total_price += (user.hourly_rate * result[i].total);
+						total_hours += result[i].total;
 					}
 					
 					// save 
-					_this.edit(proj._id,{total_hours_price : total_price},function(err,d){
+					_this.edit(proj._id,{total_hours_price : total_price, total_hours: total_hours},function(err,d){
 						callback(null,total_price);
 					});
 				}
 				else{
-					_this.edit(proj._id,{total_hours_price : 0},function(err,d){
+					_this.edit(proj._id,{total_hours_price : 0, total_hours : 0	},function(err,d){
 						callback(null,0);
 					});
 				}

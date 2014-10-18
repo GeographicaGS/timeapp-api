@@ -169,7 +169,7 @@ router.delete('/time/:id',auth, function(req, res) {
     })
 });
 
-router.get('/week/:year/:week',auth, function(req, res) {
+router.get('/userweek/:year/:week',auth, function(req, res) {
 
     TimeModel.getUserWeek({ id_user: req.user._id, year: req.params.year, week: req.params.week},function(err,items){
         if (err){
@@ -179,6 +179,7 @@ router.get('/week/:year/:week',auth, function(req, res) {
             });
         }
         else{
+            
             res.json({
                 "results" : items
             });

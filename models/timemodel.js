@@ -68,10 +68,12 @@ TimeModel.prototype.getUserWeek = function(opts, callback) {
             for (var i=0;i<7;i++){
                 response[i] = {
                     day : i+1,
-                    projects : []
+                    projects : [],
+                    total_hours : 0
                 };
             }
             for (var i=0;i<items.length;i++){
+                response[items[i].day-1].total_hours += items[i].nhours;
                 response[items[i].day-1].projects.push({
                     id_project : items[i].id_project,
                     nhours : items[i].nhours,
