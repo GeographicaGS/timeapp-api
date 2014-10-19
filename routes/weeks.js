@@ -74,7 +74,7 @@ router.get("/:id",auth,function(req,res){
 });
 
 /* Change week status */
-router.post("/change_status/:id",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
+router.post("/change_status/:id",auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
     var b = req.body,
         id = req.params.id,
         week = null;    
