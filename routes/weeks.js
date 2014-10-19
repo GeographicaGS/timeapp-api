@@ -248,6 +248,24 @@ router.post('/:year/:week',auth, function(req, res) {
 
 });
 
+router.post("/requestweekid/:year/:week",auth,function(req,res){
+    
+    var year = req.params.year,
+        week = req.params.week;
+
+    if (!year || !week || !req.user._id){
+        res.status(400).json({
+            message: "Bad parameters"
+        });
+        return;
+    }
+
+    WeekModel.requestWeekID({year: year, week: week,id_user: req.user._id},function(err,id){
+        if (err) res.status(400).json({message: "Internal error"});
+        else res.json({id: id});
+    });
+
+});
 
 
 module.exports = router;

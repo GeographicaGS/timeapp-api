@@ -110,7 +110,7 @@ WeekModel.prototype.sendWeekForApproval = function(opts,data, callback) {
             year : parseInt(opts.year),
             week : parseInt(opts.week),
             
-    }, udata,{upsert: true}, callback);
+    }, udata, callback);
 };
 
 WeekModel.prototype.getWeeks = function(status, callback) { 
@@ -180,6 +180,48 @@ WeekModel.prototype.addComment = function(id,data,callback){
             date: new Date()
         }}}, callback);
 
+};
+
+/*
+opts {
+    year:
+    week:
+    id_user:
+}
+*/
+WeekModel.prototype.requestWeekID = function(opts, callback) { 
+
+    var _this = this;
+
+    this.getWeek(opts,function(err,week){
+        if (err) callback(err);
+        else{
+            if (week._id){
+                callback(null,week._id);
+            }
+            else{
+
+                // create a week
+                _this._col.insert({
+                    id_user : new ObjectID(opts.id_user),
+                    week : parseInt(opts.week),
+                    year : parseInt(opts.year),
+                    status : cons.ST_WEEK_PENDING,
+                    notes : [] 
+                },function(err,nitems){
+                    if (err) callback(null);
+                    else{
+                        _this.getWeek(opts,function(err,week){
+                            if (err) callback(err);
+                            else if (week._id) callback(null,week._id);
+                            // Just to be sure
+                            else callback(null,null);
+                        });
+                    }
+                });
+            }
+        }
+    })
 };
        
 
