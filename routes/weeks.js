@@ -12,7 +12,7 @@ var ProjectModel = database.ProjectModel;
 var TimeModel = database.TimeModel;
 
 /* Get weeks by status */
-router.get("/list",auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
+router.get("/list",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
     var st = req.param("status");
 
     WeekModel.getWeeks(st,function(err,items){
@@ -61,7 +61,7 @@ router.get("/:id",auth,function(req,res){
         }
         else{
 
-            if (req.user.profile<cons.ST_PROFILE_ADMIN 
+            if (req.user.profile<cons.ST_PROFILE_GESTOR 
                 && !data.id_user.equals(req.user._id)){
                 res.status(403).json({forbidden:1})
             }
@@ -74,7 +74,7 @@ router.get("/:id",auth,function(req,res){
 });
 
 /* Change week status */
-router.post("/change_status/:id",auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
+router.post("/change_status/:id",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
     var b = req.body,
         id = req.params.id,
         week = null;    
@@ -192,7 +192,7 @@ router.post("/addcomment/:id",auth,function(req,res){
 
 
 /* Get user week. */
-router.get('/:year/:week',auth, profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.get('/:year/:week',auth, profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     
     var year = req.params.year,
         week = req.params.week;

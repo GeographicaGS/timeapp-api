@@ -11,7 +11,7 @@ var ProjectModel = database.ProjectModel;
 var uuid = require('node-uuid');
 
 /* Create project. */
-router.post('/',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.post('/',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     
     var b = req.body;
 
@@ -62,7 +62,7 @@ router.post('/',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
 });
 
 /* Edit project. */
-router.put('/:slug',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.put('/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     
     var b = req.body;
 
@@ -104,7 +104,7 @@ router.put('/:slug',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
 });
 
 // Get project by slug
-router.get('/:slug',auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
+router.get('/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
     var slug = req.params.slug;
     ProjectModel.getProject(slug,function(err,project){
         if (err){
@@ -120,7 +120,7 @@ router.get('/:slug',auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
 });
 
 // Get projects 
-router.get("",auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
+router.get("",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
     
     ProjectModel.getProjects({},function(err,projects){
         if (err){
@@ -138,7 +138,7 @@ router.get("",auth,profile(cons.ST_PROFILE_ADMIN),function(req,res){
 });
 
 // add project spendings
-router.post('/:id/spendings',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.post('/:id/spendings',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id;
         b = req.body;
 
@@ -162,7 +162,7 @@ router.post('/:id/spendings',auth,profile(cons.ST_PROFILE_ADMIN),function(req, r
 
 
 // edit project spendings
-router.put('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.put('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -187,7 +187,7 @@ router.put('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_ADMIN),function(r
 });
 
 // get specific spending
-router.get('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.get('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -209,7 +209,7 @@ router.get('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_ADMIN),function(r
 
 
 // delete specific spending
-router.delete('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_ADMIN), function(req, res) {
+router.delete('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_GESTOR), function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -232,7 +232,7 @@ router.delete('/:id/spendings/:uuid',auth,profile(cons.ST_PROFILE_ADMIN), functi
 
 
 // add project invoice
-router.post('/:id/invoices',auth,profile(cons.ST_PROFILE_ADMIN), function(req, res) {
+router.post('/:id/invoices',auth,profile(cons.ST_PROFILE_GESTOR), function(req, res) {
     var id = req.params.id;
         b = req.body;
 
@@ -257,7 +257,7 @@ router.post('/:id/invoices',auth,profile(cons.ST_PROFILE_ADMIN), function(req, r
 
 
 // edit project invoice
-router.put('/:id/invoices/:uuid',auth,profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.put('/:id/invoices/:uuid',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -284,7 +284,7 @@ router.put('/:id/invoices/:uuid',auth,profile(cons.ST_PROFILE_ADMIN),function(re
 });
 
 // get specific invoice
-router.get('/:id/invoices/:uuid',auth,profile(cons.ST_PROFILE_ADMIN), function(req, res) {
+router.get('/:id/invoices/:uuid',auth,profile(cons.ST_PROFILE_GESTOR), function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -306,7 +306,7 @@ router.get('/:id/invoices/:uuid',auth,profile(cons.ST_PROFILE_ADMIN), function(r
 
 
 // delete specific spending
-router.delete('/:id/invoices/:uuid',auth, profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.delete('/:id/invoices/:uuid',auth, profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -328,7 +328,7 @@ router.delete('/:id/invoices/:uuid',auth, profile(cons.ST_PROFILE_ADMIN),functio
 
 
 // add project budgets
-router.post('/:id/budgets',auth, profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.post('/:id/budgets',auth, profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id;
         b = req.body;
 
@@ -352,7 +352,7 @@ router.post('/:id/budgets',auth, profile(cons.ST_PROFILE_ADMIN),function(req, re
 
 
 // edit project budgets
-router.put('/:id/budgets/:uuid',auth, profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.put('/:id/budgets/:uuid',auth, profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -377,7 +377,7 @@ router.put('/:id/budgets/:uuid',auth, profile(cons.ST_PROFILE_ADMIN),function(re
 });
 
 // get specific budget
-router.get('/:id/budgets/:uuid',auth, profile(cons.ST_PROFILE_ADMIN),function(req, res) {
+router.get('/:id/budgets/:uuid',auth, profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
@@ -399,7 +399,7 @@ router.get('/:id/budgets/:uuid',auth, profile(cons.ST_PROFILE_ADMIN),function(re
 
 
 // delete specific budget
-router.delete('/:id/budgets/:uuid',auth,profile(cons.ST_PROFILE_ADMIN), function(req, res) {
+router.delete('/:id/budgets/:uuid',auth,profile(cons.ST_PROFILE_GESTOR), function(req, res) {
     var id = req.params.id,
         uuid = req.params.uuid;
         b = req.body;
