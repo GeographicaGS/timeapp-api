@@ -3,7 +3,7 @@ var router = express.Router();
 var auth = require('../auth.js').authenticate;
 
 /* GET start page */
-router.get('/', auth, function(req, res) {
+router.get('/', function(req, res) {
    res.send("API running");
 });
 
