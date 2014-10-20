@@ -130,7 +130,7 @@ function init(callback){
                 email: "paula.julia@geographica.gs",
                 name: "Paula",
                 surname : "Juliá",
-                profile : cons.ST_PROFILE_ADMIN ,
+                profile : cons.ST_PROFILE_GESTOR ,
                 status : cons.ST_USER_ENABLE
             },
             {
@@ -139,7 +139,7 @@ function init(callback){
                 email: "hector.garcia@geographica.gs",
                 name: "Héctor",
                 surname : "García",
-                profile : cons.ST_PROFILE_ADMIN ,
+                profile : cons.ST_PROFILE_GESTOR ,
                 status : cons.ST_USER_ENABLE
             },
             {
