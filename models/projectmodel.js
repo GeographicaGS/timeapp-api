@@ -32,7 +32,11 @@ ProjectModel.prototype.create = function(data, callback) {
 		notes : []
     });
 
-    this._col.insert(this.parseQuery(d),{},callback);
+	d.id_user = new ObjectID(d.id_user);
+	d.creator = new ObjectID(d.creator);
+	d.budgets[0].id_user = new ObjectID(d.id_user);
+
+    this._col.insert(d,{},callback);
 };
 
 ProjectModel.prototype.getProject = function(slug, callback) { 
