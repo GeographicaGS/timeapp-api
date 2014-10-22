@@ -51,9 +51,15 @@ ProjectModel.prototype.getProjectById = function(id,fields, callback) {
 };
 
 ProjectModel.prototype.edit = function(id, data, callback) {
+	data.last_user_mod = new ObjectID(data.last_user_mod);
+	for (var i=0;i<data.members.length;i++){
+		data.members[i].id_user = new ObjectID(data.members[i].id_user );
+	}
+	console.log(data);
+	
     this._col.update(
     	{_id :  new ObjectID(id)},
-    	{ $set : this.parseQuery(data)},
+    	{ $set : data},
     	{},
     	callback);
 };
