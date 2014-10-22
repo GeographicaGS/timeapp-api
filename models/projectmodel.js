@@ -22,6 +22,12 @@ util.inherits(ProjectModel, BaseModel);
 */
 ProjectModel.prototype.create = function(data, callback) {
 
+	if (data.hasOwnProperty("members")){
+		for (var i=0;i<data.members.length;i++){
+			data.members[i].id_user = new ObjectID(data.members[i].id_user );
+		}
+	}
+
 	var d = merge(data,{
 		status: cons.ST_PROJECT_OPEN,
         total_spendings : 0,
@@ -51,12 +57,16 @@ ProjectModel.prototype.getProjectById = function(id,fields, callback) {
 };
 
 ProjectModel.prototype.edit = function(id, data, callback) {
-	data.last_user_mod = new ObjectID(data.last_user_mod);
-	for (var i=0;i<data.members.length;i++){
-		data.members[i].id_user = new ObjectID(data.members[i].id_user );
+	if (data.hasOwnProperty("last_user_mod")){
+		data.last_user_mod = new ObjectID(data.last_user_mod);	
 	}
-	console.log(data);
 	
+	if (data.hasOwnProperty("members")){
+		for (var i=0;i<data.members.length;i++){
+			data.members[i].id_user = new ObjectID(data.members[i].id_user );
+		}
+	}
+
     this._col.update(
     	{_id :  new ObjectID(id)},
     	{ $set : data},
