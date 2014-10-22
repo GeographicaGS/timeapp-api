@@ -48,7 +48,7 @@ router.get("/user/list",auth,function(req,res){
 });
 
 /* Get week by id */
-router.get("/:id",auth,function(req,res){
+router.get("/:id",auth,profile(cons.ST_PROFILE_USER)function(req,res){
     var id = req.params.id;
 
     WeekModel.getWeekCompleteByID(id,function(err,data){
@@ -192,7 +192,7 @@ router.post("/addcomment/:id",auth,function(req,res){
 
 
 /* Get user week. */
-router.get('/:year/:week',auth, profile(cons.ST_PROFILE_GESTOR),function(req, res) {
+router.get('/:year/:week',auth, profile(cons.ST_PROFILE_USER),function(req, res) {
     
     var year = req.params.year,
         week = req.params.week;
@@ -220,7 +220,7 @@ router.get('/:year/:week',auth, profile(cons.ST_PROFILE_GESTOR),function(req, re
 });
 
 /* Send week for approval */
-router.post('/:year/:week',auth, function(req, res) {
+router.post('/:year/:week',auth, profile(cons.ST_PROFILE_USER),function(req, res) {
     
     var year = req.params.year,
         week = req.params.week;
