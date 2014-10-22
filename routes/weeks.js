@@ -48,7 +48,7 @@ router.get("/user/list",auth,function(req,res){
 });
 
 /* Get week by id */
-router.get("/:id",auth,profile(cons.ST_PROFILE_USER)function(req,res){
+router.get("/:id",auth,profile(cons.ST_PROFILE_USER),function(req,res){
     var id = req.params.id;
 
     WeekModel.getWeekCompleteByID(id,function(err,data){
