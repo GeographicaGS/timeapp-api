@@ -119,6 +119,24 @@ router.get('/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
     });
 });
 
+// Get project for admin by slug
+router.get('/adminversion/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
+    var slug = req.params.slug;
+    ProjectModel.getProjectForAdmin(slug,function(err,project){
+        if (err){
+            res.status(400).json({
+                message: "Internal error",
+                error: err
+            });
+        }
+        else{
+            res.json(project);
+        }
+    });
+});
+
+
+
 // Get projects 
 router.get("",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
     

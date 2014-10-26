@@ -51,6 +51,41 @@ ProjectModel.prototype.getProject = function(slug, callback) {
 	},callback);
 };
 
+ProjectModel.prototype.getProjectForAdmin = function(slug, callback) { 
+	var _this = this;
+	this._col.findOne({
+		slug : slug
+	},function(err,proj){
+		if (err) callback(err);
+		else{
+			// let's get the hours grouped by user
+			col = _this._db.collection("projects_times"),
+			col.aggregate([
+				{ $match : { 
+						id_project: new ObjectID(proj._id),
+						approved: true
+					} 
+				},
+				{ $group : {_id: "$id_user", total : {$sum : "$nhours"} } }
+			],function(err, result) {
+
+				if (err ){
+					callback(err);
+				}
+				else{
+					proj.users_times = {};
+					for (var i=0;i< result.length;i++){
+						proj.users_times[result[i]._id] = result[i].total;
+					}
+					callback(null,proj);
+				}
+				
+			});
+		}	
+	});
+};
+
+
 ProjectModel.prototype.getProjectById = function(id,fields, callback) { 
 
 	this._col.findOne({_id : new ObjectID(id)},fields,callback);
