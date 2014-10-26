@@ -81,7 +81,7 @@ ProjectModel.prototype.getProjects = function(opts, callback) {
 
 /*
 */
-ProjectModel.prototype.updateTotalHoursPrice = function(id, callback) { 
+ProjectModel.prototype.updateTotalHours = function(id, callback) { 
 	
 	var _this = this;
 	// get project

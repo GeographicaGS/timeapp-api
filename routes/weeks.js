@@ -137,7 +137,7 @@ router.post("/change_status/:id",auth,profile(cons.ST_PROFILE_ADMIN),function(re
             else{
                 for (var i=0;i<result.length;i++){
 
-                    ProjectModel.updateTotalHoursPrice(result[i]._id,function(err,total){
+                    ProjectModel.updateTotalHours(result[i]._id,function(err,total){
                         if (err){
                             sendError(err);
                         }
