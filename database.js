@@ -95,7 +95,7 @@ function createIndex(){
 }
 
 function init(callback){
-    MongoClient.connect(config.mongodb, function(err, localdb) {
+    MongoClient.connect('mongodb://' + config.database.user + ':' + config.database.password + '@' + config.database.host + ':' + config.database.port + '/' + config.database.db, function(err, localdb) {
         if(err) throw err;
 
         db = localdb;
