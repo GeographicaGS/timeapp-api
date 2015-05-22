@@ -11,7 +11,6 @@ function WeekModel(db) {
 
 util.inherits(WeekModel, BaseModel);
 
-
 /*
 opts{
     id_user:
@@ -224,5 +223,6 @@ WeekModel.prototype.requestWeekID = function(opts, callback) {
     })
 };
        
+
 
 module.exports = WeekModel;

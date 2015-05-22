@@ -94,8 +94,20 @@ function createIndex(){
 
 }
 
+function getURLConn(){
+    var urlConn = 'mongodb://' 
+    if (config.database.user && config.database.password){
+        urlConn += config.database.user + ':' + config.database.password + '@';
+    }
+
+    urlConn += config.database.host + ':' + config.database.port + '/' + config.database.db;
+
+    return urlConn;
+}
+
 function init(callback){
-    MongoClient.connect('mongodb://' + config.database.user + ':' + config.database.password + '@' + config.database.host + ':' + config.database.port + '/' + config.database.db, function(err, localdb) {
+
+    MongoClient.connect(getURLConn(), function(err, localdb) {
         if(err) throw err;
 
         db = localdb;
@@ -188,4 +200,7 @@ function init(callback){
     });
 }
 
-module.exports.init = init
+module.exports.init = init;
+
+module.exports.getURLConn = getURLConn;
+

@@ -6,7 +6,7 @@ var UserModel = database.UserModel;
 
 /* GET users */
 router.get('/', auth, function(req, res) {
-	UserModel.getUsers(function(error, array){
+	UserModel.getUsers({},function(error, array){
         if (error){
             res.status(400).json({
                 message : "Error",

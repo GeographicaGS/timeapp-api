@@ -21,8 +21,8 @@ UserModel.prototype.getUser = function(query,callback) {
     this._col.findOne(this.parseQuery(query), callback);
 };
 
-UserModel.prototype.getUsers = function(callback){
-    this._col.find({status: cons.ST_USER_ENABLE }).toArray(function(error, array){
+UserModel.prototype.getUsers = function(filter,callback){
+    this._col.find(filter).toArray(function(error, array){
         for (var i=0;i< array.length;i++){
             delete array[i]["password"];
         }  

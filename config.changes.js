@@ -10,7 +10,17 @@ config = {
     },
     createUsersOnStart : false,
     authTimestampLiveTime: 3000,
-    authEnable : true
+    authEnable : true,
+    email: {
+        server: {
+            user:    "XXX", 
+            password:"XXXX", 
+            host:    "XXXX", 
+            ssl:     true
+        },
+        managerEmail: 'managers.timeapp@geographica.gs',
+        noreply: 'no-reply-timeapp@geographica.gs',
+    }
 }
 
 module.exports = config;

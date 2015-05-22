@@ -33,7 +33,7 @@ function authenticate(req, res, next) {
         var currentTime = new Date().getTime();
 
         UserModel.getUser({ username: credentials.username },function(error,user){
-            if (!user){
+            if (!user || user.status!=cons.ST_USER_ENABLE){
                 res.status(401)
                 res.json({
                     "messsage" : "Bad credentials"
