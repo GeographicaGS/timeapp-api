@@ -41,7 +41,7 @@ function processWeek(u,week,year){
                 sendTextEmail({
                     text: "Hey you little frog!\n\nYour week have not been accepted " + week_date_str + "\n\n"
                             + "Insist to your manager, I don't want to email you everyday that's is very tired!",
-                    subject: "[L1] Timeapp - Missing week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
+                    subject: "[L1] Timeapp - Unaccepted week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
                     to : u.email,
                     cc : config.email.managerEmail
                 });   
