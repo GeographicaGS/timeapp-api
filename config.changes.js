@@ -15,7 +15,7 @@ config = {
         server: {
             user:    "XXX", 
             password:"XXXX", 
-            host:    "XXXX", 
+            host:    "XXXX",
             ssl:     true
         },
         managerEmail: 'managers.timeapp@geographica.gs',
