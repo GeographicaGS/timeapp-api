@@ -14,11 +14,24 @@
     "debug": "~2.0.0",
     "jade": "~1.6.0",
     "MD5": "1.2.1",
-    "mongodb" : "~1.4.18",
-    "moment" : "~2.8.3",
+    "mongodb": "~1.4.18",
+    "moment": "~2.8.3",
     "merge": "~1.2.0",
-    "slugs" : "~0.1.3",
-    "underscore" : "~1.7.0",
-    "node-uuid" : "~1.4.1"
-  }
+    "slugs": "~0.1.3",
+    "underscore": "~1.7.0",
+    "node-uuid": "~1.4.1"
+  },
+  "description": "timeapp-api ===========",
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GeographicaGS/timeapp-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GeographicaGS/timeapp-api/issues"
+  },
+  "homepage": "https://github.com/GeographicaGS/timeapp-api"
 }
