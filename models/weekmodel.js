@@ -145,7 +145,8 @@ WeekModel.prototype.getUserWeeks = function(opts, callback) {
 WeekModel.prototype.getProjectsInWeek = function(id_week, callback) { 
 
     this._db.collection("projects_times").aggregate([
-                { $group : {_id: "$id_project"} }
+                { $match : {week : id_week} },
+                { $group : {_id: "$id_project"}}
             ],callback);
 };
 

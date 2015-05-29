@@ -4,7 +4,8 @@ var util = require("util"),
     cons = require("../cons.js"),
     ObjectID = require('mongodb').ObjectID,
     uuid = require('node-uuid'),
-    _= require("underscore");
+    _= require("underscore"),
+    moment = require("moment");
 
 
 function ProjectModel(db) {
@@ -51,24 +52,122 @@ ProjectModel.prototype.getProject = function(slug, callback) {
 	},callback);
 };
 
-ProjectModel.prototype.getProjectForAdmin = function(slug, callback) { 
+function getMongoDateFilter(datefilter){
+	var yearmin = datefilter.min.year,
+		yearmax = datefilter.max.year,
+		weekmin = datefilter.min.week,
+		weekmax = datefilter.max.week;
+
+	if (yearmin == yearmax){
+		return {
+			"year" : {
+				$eq : yearmin
+			},
+			"week": {
+				$gte: weekmin,
+				$lte : weekmax
+			}
+		}
+	}
+	else {
+		var orCondition = [
+			// Min Year
+			{
+				"year" : { $eq : yearmin},
+				"week" : { $gte : weekmin}
+			},
+			// Last year
+			{
+				"year" : { $eq : yearmax},
+				"week" : { $lte : weekmax}
+			}
+		];
+		
+		if (yearmax-yearmin>1){
+			// Add intermediate days
+			var intermediateInYears = [];
+			for (var i=yearmin+1;i<yearmax;i++){
+				intermediateInYears.push(i);
+			}	
+
+			orCondition.push({
+				"year" : {$in : intermediateInYears}
+			});
+		}
+		
+		return {
+			$or : orCondition
+		}
+	}
+
+
+}
+
+function filterArrayByDate(array,startDate,endDate){
+
+	var newArray = []; 
+	for (var i=0;i<array.length;i++){
+		var current = moment(array[i].date).startOf('day');
+		if (current>=startDate && current<=endDate){
+			newArray.push(array[i]);
+		}
+	}
+
+	return newArray;
+}
+
+ProjectModel.prototype.getProjectForAdmin = function(opts, callback) { 
 	var _this = this;
 	this._col.findOne({
-		slug : slug
+		slug : opts.slug
 	},function(err,proj){
-		if (err) callback(err);
+		if (err){
+			callback(err);	
+		} 
 		else{
+
+			var filter = {  $match : { 
+					id_project: new ObjectID(proj._id),
+					approved: true
+				}
+			};
+
+			if (opts.datefilter){
+				filter["$match"] = _.extend({},filter["$match"],getMongoDateFilter(opts.datefilter));
+
+				var startDate = moment(opts.datefilter.min.year + "-01-01").day(1).isoWeek(opts.datefilter.min.week).startOf('day'),
+					endDate = moment(opts.datefilter.max.year + "-01-01").day(7).isoWeek(opts.datefilter.max.week).startOf('day');
+				
+				// Filter budgets by date.
+				proj.budgets = filterArrayByDate(proj.budgets,startDate,endDate);
+				proj.spendings = filterArrayByDate(proj.spendings,startDate,endDate);
+				proj.invoices = filterArrayByDate(proj.invoices,startDate,endDate);
+
+			}
+
+			// refresh totals
+			proj.total_budget = 0;
+			for (var i=0;i<proj.budgets.length;i++){
+				proj.total_budget += proj.budgets[i].amount;
+			}
+			
+			proj.total_spendings = 0;
+			for (var i=0;i<proj.spendings.length;i++){
+				proj.total_spendings += proj.spendings[i].amount;
+			}
+			
+			proj.total_invoices = 0;
+			for (var i=0;i<proj.invoices.length;i++){
+				proj.total_invoices += proj.invoices[i].amount;
+			}
+				
 			// let's get the hours grouped by user
 			col = _this._db.collection("projects_times"),
 			col.aggregate([
-				{ $match : { 
-						id_project: new ObjectID(proj._id),
-						approved: true
-					} 
-				},
+				filter
+				,
 				{ $group : {_id: "$id_user", total : {$sum : "$nhours"} } }
 			],function(err, result) {
-
 				if (err ){
 					callback(err);
 				}
@@ -77,6 +176,22 @@ ProjectModel.prototype.getProjectForAdmin = function(slug, callback) {
 					for (var i=0;i< result.length;i++){
 						proj.users_times[result[i]._id] = result[i].total;
 					}
+
+					// refresh total_hours_price
+					proj.total_hours_price = 0;
+					proj.total_hours = 0;
+					for (user in proj.users_times){
+						proj.total_hours += proj.users_times[user];
+
+						if (proj.type_rate == 1){
+							proj.total_hours_price += proj.users_times[user] * proj.hourly_rate;
+						}
+						else if (proj.type_rate == 2){
+							var member = _.filter(proj.members, function(m){ return m.id_user.equals(user); })[0];
+							proj.total_hours_price += proj.users_times[user] * member.hourly_rate;
+						}
+					}
+					
 					callback(null,proj);
 				}
 				
@@ -89,24 +204,97 @@ ProjectModel.prototype.getProjectForAdmin = function(slug, callback) {
 ProjectModel.prototype.getProjectById = function(id,fields, callback) { 
 
 	this._col.findOne({_id : new ObjectID(id)},fields,callback);
+}
+
+ProjectModel.prototype.__performEdit = function(id,data,callback){
+	var _this = this;
+	this._col.update(
+    	{_id :  new ObjectID(id)},
+    	{ $set : data},
+    	{},
+    	function(err,data){
+    		if (err){
+    			callback(err,null);
+    			return;
+    		}
+    		else{
+    			_this.updateTotalHours(id,callback);
+    		}
+    	});
 };
+
+ProjectModel.prototype.__crudEdit = function(id,data,callback){
+	this._col.update(
+    	{_id :  new ObjectID(id)},
+    	{ $set : data},
+    	{},
+    	callback);
+}
 
 ProjectModel.prototype.edit = function(id, data, callback) {
 	if (data.hasOwnProperty("last_user_mod")){
 		data.last_user_mod = new ObjectID(data.last_user_mod);	
 	}
 	
-	if (data.hasOwnProperty("members")){
-		for (var i=0;i<data.members.length;i++){
-			data.members[i].id_user = new ObjectID(data.members[i].id_user );
+	var _this = this;
+	// get current users
+	this.getProjectById(id,{"members":1},function(err,oldproj){
+		if (err){
+			callback(err);
+			return
 		}
-	}
 
-    this._col.update(
-    	{_id :  new ObjectID(id)},
-    	{ $set : data},
-    	{},
-    	callback);
+		if (data.hasOwnProperty("members")){
+			for (var i=0;i<data.members.length;i++){
+				data.members[i].id_user = new ObjectID(data.members[i].id_user );
+			}
+		}
+
+		var oldmembersflat = _.pluck(oldproj.members,"id_user");
+		var membersflat = _.pluck(data.members,"id_user");
+		var usersToRemove = [];
+		
+		for (var i=0;i<oldproj.members.length;i++){
+
+			var found = false;
+			for (var j=0;j<data.members.length;j++){
+				if (data.members[j].id_user.equals(oldproj.members[i].id_user)){
+					found = true;
+				}
+			}
+
+			if (!found){
+				usersToRemove.push(oldproj.members[i].id_user);
+			}
+		}
+
+		if (usersToRemove.length>0){
+			var col = _this._db.collection("projects_times");
+			col.count({
+				id_project : new ObjectID(id),
+				id_user : { $in : usersToRemove}
+			},function(err,n){
+				if (err){
+					callback(err);
+					return;
+				}
+
+				if (n!=0){
+					callback("Trying to remove a user with hours from the project");
+					return;
+				}
+				else{
+					_this.__performEdit(id,data,callback);
+				}
+
+			});
+		}
+		else{
+			_this.__performEdit(id,data,callback);
+		}
+	  
+	});
+
 };
 
 ProjectModel.prototype.getProjects = function(opts, callback) { 
@@ -120,6 +308,8 @@ ProjectModel.prototype.updateTotalHours = function(id, callback) {
 	
 	var _this = this;
 	// get project
+	console.log("UpdateTotalHours");
+	console.log(id);
 	this.getProjectById(id,{},function(err,proj){
 		if (err) {
 			callback(err);
@@ -140,21 +330,20 @@ ProjectModel.prototype.updateTotalHours = function(id, callback) {
 				},
 				{ $group : {_id: "$id_project", total : {$sum : "$nhours"} } }
 			],function(err, result) {
-
+				
 				if (err ){
 					callback(err);
 				}
 				else if (result && result.length>0) {
-
 					total_price = result[0].total * proj.hourly_rate;
 
 					// save 
-					_this.edit(proj._id,{total_hours_price : total_price, total_hours: result[0].total},function(err,d){
+					_this.__crudEdit(proj._id,{total_hours_price : total_price, total_hours: result[0].total},function(err,d){
 						callback(null,total_price);
 					});
 				}
 				else{
-					_this.edit(proj._id,{total_hours_price : 0, total_hours : 0},function(err,d){
+					_this.__crudEdit(proj._id,{total_hours_price : 0, total_hours : 0},function(err,d){
 						callback(null,0);
 					});
 				}
@@ -180,12 +369,12 @@ ProjectModel.prototype.updateTotalHours = function(id, callback) {
 					}
 					
 					// save 
-					_this.edit(proj._id,{total_hours_price : total_price, total_hours: total_hours},function(err,d){
+					_this.__crudEdit(proj._id,{total_hours_price : total_price, total_hours: total_hours},function(err,d){
 						callback(null,total_price);
 					});
 				}
 				else{
-					_this.edit(proj._id,{total_hours_price : 0, total_hours : 0	},function(err,d){
+					_this.__crudEdit(proj._id,{total_hours_price : 0, total_hours : 0	},function(err,d){
 						callback(null,0);
 					});
 				}
@@ -564,6 +753,113 @@ ProjectModel.prototype.deleteBudget  = function(opts,callback){
 				_this.updateProjectTotalBudgets(opts.id_project,callback);
 			}
 		});
+}
+
+ProjectModel.prototype.__countMembers = function(p){
+	var col = this._db.collection("projects_times"),
+		members = _.pluck(p.members,"id_user"),
+		_this = this;
+
+	col.aggregate([
+		{
+			$match: {
+				id_project : p["_id"],
+				id_user : { $nin : members}
+			}
+		},
+		{ $group : {_id: "$id_user" } }
+		],function(err,result){
+			if (err ){
+				callback(err);
+			}
+			else{
+				if (result.length){
+					
+					var col2 = _this._db.collection("users");
+					for (var i=0;i<result.length;i++){
+
+
+						col2.findOne({
+							_id : new ObjectID(result[i]._id)
+						},{"name":1,"surname":result},function(err,result){
+							if (err){
+								console.log(err);
+							}
+							else{
+								console.log(p.name + ": " + result.name + " " + result.surname);
+							}
+						});
+					}
+
+				}
+			}
+	});
+}
+
+ProjectModel.prototype.__addMissingMembers = function(p){
+	var col = this._db.collection("projects_times"),
+		members = _.pluck(p.members,"id_user"),
+		_this = this;
+
+	col.aggregate([
+		{
+			$match: {
+				id_project : p["_id"],
+				id_user : { $nin : members}
+			}
+		},
+		{ $group : {_id: "$id_user" } }
+		],function(err,result){
+			if (err ){
+				callback(err);
+			}
+			else{
+				if (result.length){
+					
+					var col2 = _this._db.collection("users");
+					var members = [];
+
+					for (var i=0;i<result.length;i++){
+						members.push({
+							id_user : new ObjectID(result[i]._id),
+							hourly_rate : "25"
+						});
+					}
+
+					_this._col.update(
+						{_id :  p._id},
+						{ $push: { members: { $each: members } } },
+				    	{},
+				    	function(err){
+				    		if (err){
+				    			console.log(error)
+				    		}
+				    		else{
+				    			console.log("Fix project " + p.name)
+				    		}
+				    	});
+				}
+			}
+	});	
+}
+
+ProjectModel.prototype.fixProjectMembers = function(callback){
+	var _this = this;
+	this._col.find({
+
+	}).toArray(function (err,results){
+		if (err){
+			callback(err);
+			return;
+		}
+		for (var i=0;i<results.length;i++){
+			var p = results[i];
+			_this.__countMembers(p);	
+			//_this.__addMissingMembers(p);	
+		}
+		
+		
+	})
 }
 
 

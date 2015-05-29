@@ -120,9 +120,26 @@ router.get('/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
 });
 
 // Get project for admin by slug
-router.get('/adminversion/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
-    var slug = req.params.slug;
-    ProjectModel.getProjectForAdmin(slug,function(err,project){
+router.get('/adminversion/:slug/:weekstart?/:weekend?',auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
+
+    var opts = {
+        slug : req.params.slug
+    };
+
+    if (req.params.weekstart && req.params.weekend){
+        opts["datefilter"] = {
+            min : {
+                year : parseInt(req.params.weekstart.split("-")[0]),
+                week : parseInt(req.params.weekstart.split("-")[1])
+            },
+            max : {
+                year : parseInt(req.params.weekend.split("-")[0]),
+                week : parseInt(req.params.weekend.split("-")[1]),
+            }
+        };
+    }
+   
+    ProjectModel.getProjectForAdmin(opts,function(err,project){
         if (err){
             res.status(400).json({
                 message: "Internal error",
