@@ -83,7 +83,8 @@ router.put('/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
         last_user_mod: req.user._id,
         date_start: b.date_start ? b.date_start : null,
         date_finish: b.date_finish ? b.date_finish : null,
-        color: b.color ? b.color : "#ccc"
+        color: b.color ? b.color : "#ccc",
+        status: parseInt(b.status)
     };
 
     ProjectModel.edit(b._id,data,function(err,item){
@@ -152,12 +153,19 @@ router.get('/adminversion/:slug/:weekstart?/:weekend?',auth,profile(cons.ST_PROF
     });
 });
 
-
-
 // Get projects 
-router.get("",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
+router.get("/list/:status",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
+
+    var status = req.params.status
+    if (status != cons.ST_PROJECT_OPEN && status!= cons.ST_PROJECT_ARCHIVE){
+        res.status(400).json({
+            message: "Internal error",
+            error: err
+        });
+        return;
+    }
     
-    ProjectModel.getProjects({},function(err,projects){
+    ProjectModel.getProjects({status: parseInt(status)},function(err,projects){
         if (err){
             res.status(400).json({
                 message: "Internal error",

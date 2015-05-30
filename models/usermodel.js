@@ -35,7 +35,8 @@ UserModel.prototype.getUserProjects = function(iduser,callback){
     var col = this._db.collection("projects");
 
     col.find({
-        "members.id_user": new ObjectID(iduser)
+        "members.id_user": new ObjectID(iduser),
+        "status" : cons.ST_PROJECT_OPEN
     },
     {
         "fields" : ["name","_id"],

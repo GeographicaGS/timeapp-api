@@ -298,8 +298,8 @@ ProjectModel.prototype.edit = function(id, data, callback) {
 };
 
 ProjectModel.prototype.getProjects = function(opts, callback) { 
-
-	this._col.find({status: cons.ST_PROJECT_OPEN},{sort: { name:1}}).toArray(callback);
+	console.log(opts);
+	this._col.find(opts,{sort: { name:1}}).toArray(callback);
 };
 
 /*
