@@ -68,7 +68,7 @@ WeekModel.prototype.getWeekCompleteByID = function(id, callback) {
             ],function(err, result) {
                 
                 // get list of projects name
-                colprojs.find({status: cons.ST_PROJECT_OPEN},
+                colprojs.find({},
                     {_id:1,name:1},
                     {sort: { name:1}}).toArray(function(err,projs){
                         if (err){
@@ -118,7 +118,7 @@ WeekModel.prototype.getWeeks = function(status, callback) {
         query["status"] = parseInt(status);
     }
 
-    this._col.find(query,{sort: {date_send:1}}).toArray(callback);
+    this._col.find(query,{sort: {year:-1,week:-1}}).toArray(callback);
 };
 
 
