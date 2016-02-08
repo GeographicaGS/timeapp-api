@@ -5,49 +5,49 @@ var N_PREVIOUS_WEEK = 8;
 var email = require("./email.js");
 var sendTextEmail = email.sendTextEmail;
 var config = require("../config.js");
+var utils = require("../utils.js");
 
 
 function processWeek(u,week,year){
     var WeekModel = database.WeekModel;
     WeekModel.getWeek({id_user:u._id,week:week,year:year},function(err,w){            
 
-            var mondaydate = moment(year+"-01-01").day("Monday").isoWeek(week);
-            var week_date_str = mondaydate.format("DD/MM/YYYY") 
-                                + "[" + week + "]";
-            if (err){
-                console.log(err);
-            }
+        var week_date_str = utils.getBeginWeekDateFormated(year,week) + " [" + week + "]";
+        
+        if (err){
+            console.log(err);
+        }
 
-            if (!w){
-                
-                sendTextEmail({
-                    text: "Hey you little frog!\n\nYou've forgot to send your timesheet of the week " + week_date_str + "\n\n"
-                            + "Upload it right now!",
-                    subject: "[L1] Timeapp - Missing week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
-                    to : u.email,
-                    cc : config.email.managerEmail
-                });
-            }
-            else if (w.status == cons.ST_WEEK_PENDING){
-                sendTextEmail({
-                    text: "Hey you little frog!\n\nYou've forgot to send your timesheet of the week " + week_date_str + "\n\n"
-                            + "Upload it right now!",
-                    subject: "[L1] Timeapp - Missing week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
-                    to : u.email,
-                    cc : config.email.managerEmail
-                });  
-            }
-            else if (w.status != cons.ST_WEEK_ACCEPTED){
-                sendTextEmail({
-                    text: "Hey you little frog!\n\nYour week have not been accepted " + week_date_str + "\n\n"
-                            + "Insist to your manager, I don't want to email you everyday that's is very tired!",
-                    subject: "[L1] Timeapp - Unaccepted week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
-                    to : u.email,
-                    cc : config.email.managerEmail
-                });   
-            }
+        if (!w){
+            
+            sendTextEmail({
+                text: "Hey you little frog!\n\nYou've forgot to send your timesheet of the week " + week_date_str + "\n\n"
+                        + "Upload it right now!",
+                subject: "[L1] Timeapp - Missing week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
+                to : u.email,
+                cc : config.email.managerEmail
+            });
+        }
+        else if (w.status == cons.ST_WEEK_PENDING){
+            sendTextEmail({
+                text: "Hey you little frog!\n\nYou've forgot to send your timesheet of the week " + week_date_str + "\n\n"
+                        + "Upload it right now!",
+                subject: "[L1] Timeapp - Missing week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
+                to : u.email,
+                cc : config.email.managerEmail
+            });  
+        }
+        else if (w.status != cons.ST_WEEK_ACCEPTED){
+            sendTextEmail({
+                text: "Hey you little frog!\n\nYour week have not been accepted " + week_date_str + "\n\n"
+                        + "Insist to your manager, I don't want to email you everyday that's is very tired!",
+                subject: "[L1] Timeapp - Unaccepted week " + week_date_str + " - [" + u.name + " " + u.surname +"]",
+                to : u.email,
+                cc : config.email.managerEmail
+            });   
+        }
 
-        });
+    });
 }
 
 
