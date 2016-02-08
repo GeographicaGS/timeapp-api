@@ -86,7 +86,7 @@ database.init(function(err){
         for (var i=0;i<users.length;i++){
             var u = users[i];
 
-            if (["juanpe","hector","pedro","javigu","practica_1","practica_2"].indexOf(u.username) == -1){
+            if (["juanpe","hector","pedro","practica_1","practica_2"].indexOf(u.username) == -1){
                 processUser(u);    
             }
             
