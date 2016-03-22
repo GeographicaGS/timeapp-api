@@ -63,7 +63,7 @@ function processUser(u){
             continue;
         }
         
-        var mondaydate = moment(year+"-01-01").day("Monday").isoWeek(week);
+        var mondaydate = utils.getBeginWeekDate(year,week);
          if (mondaydate<u.date){
             // nothing to do. User was registered after this week.
             continue;

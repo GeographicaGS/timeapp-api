@@ -36,5 +36,6 @@ function getEndWeekDateFormated(year,week){
   return getEndWeekDate(year,week).format("DD/MM/YYYY");
 }
 
+module.exports.getBeginWeekDate = getBeginWeekDate;
 module.exports.getBeginWeekDateFormated = getBeginWeekDateFormated;
 module.exports.getEndWeekDateFormated = getEndWeekDateFormated;
