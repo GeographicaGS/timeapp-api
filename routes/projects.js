@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var moduleauth = require('../auth.js');
 var auth = moduleauth.authenticate;
-var profile = moduleauth.profile;   
+var profile = moduleauth.profile;
 var slugs = require("slugs");
 var cons = require("../cons.js");
 
@@ -12,7 +12,7 @@ var uuid = require('node-uuid');
 
 /* Create project. */
 router.post('/',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
-    
+
     var b = req.body;
 
     if (!b.name || !b.budget || !b.type_rate){
@@ -44,7 +44,7 @@ router.post('/',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
     };
 
     ProjectModel.create(data,function(err,items){
-        
+
         if (err || !items.length){
             res.status(400).json({
                 message: "Internal error",
@@ -63,7 +63,7 @@ router.post('/',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
 
 /* Edit project. */
 router.put('/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
-    
+
     var b = req.body;
 
     if (!b.name || !b.type_rate){
@@ -77,6 +77,7 @@ router.put('/:slug',auth,profile(cons.ST_PROFILE_GESTOR),function(req, res) {
         slug: slugs(b.name),
         name: b.name,
         members : b.members ? b.members : [],
+        manager: b.manager ? b.manager : null,
         type_rate: b.type_rate,
         hourly_rate: b.hourly_rate ? b.hourly_rate : null,
         last_date_mod: new Date(),
@@ -139,7 +140,7 @@ router.get('/adminversion/:slug/:weekstart?/:weekend?',auth,profile(cons.ST_PROF
             }
         };
     }
-   
+
     ProjectModel.getProjectForAdmin(opts,function(err,project){
         if (err){
             res.status(400).json({
@@ -153,7 +154,7 @@ router.get('/adminversion/:slug/:weekstart?/:weekend?',auth,profile(cons.ST_PROF
     });
 });
 
-// Get projects 
+// Get projects
 router.get("/list/:status",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res){
 
     var status = req.params.status
@@ -164,7 +165,7 @@ router.get("/list/:status",auth,profile(cons.ST_PROFILE_GESTOR),function(req,res
         });
         return;
     }
-    
+
     ProjectModel.getProjects({status: parseInt(status)},function(err,projects){
         if (err){
             res.status(400).json({
